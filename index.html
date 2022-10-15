@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<!-- Created with https://packager.turbowarp.org/ -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- We only include this to explicitly loosen the CSP of various packager environments. It does not provide any security. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
+  <title>Luk: Ⓜ️🛠️ [v1.2.5]</title>
+  <style>
+    body {
+      color: #ffffff;
+      font-family: sans-serif;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    :root, body.is-fullscreen {
+      background-color: #00032b;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    h1 {
+      font-weight: normal;
+    }
+    a {
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    #app, #loading, #error, #launch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+      background-color: #00032b;
+    }
+    #launch {
+      background-color: rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+    }
+    .green-flag {
+      width: 80px;
+      height: 80px;
+      padding: 16px;
+      border-radius: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      border: 3px solid hsla(0, 100%, 100%, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    #loading {
+      
+    }
+    .progress-bar-outer {
+      border: 1px solid currentColor;
+      height: 10px;
+      width: 200px;
+      max-width: 200px;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background-color: currentColor;
+    }
+    .loading-text, noscript {
+      font-weight: normal;
+      font-size: 36px;
+      margin: 0 0 16px;
+    }
+    .loading-image {
+      margin: 0 0 16px;
+    }
+    #error-message, #error-stack {
+      font-family: monospace;
+      max-width: 600px;
+      white-space: pre-wrap;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    #error-stack {
+      text-align: left;
+      max-height: 200px;
+      overflow: auto;
+    }
+    .control-button {
+      width: 2rem;
+      height: 2rem;
+      padding: 0.375rem;
+      border-radius: 0.25rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      border: 0;
+      border-radius: 4px;
+    }
+    .control-button:hover {
+      background: #ff4c4c26;
+    }
+    .control-button.active {
+      background: #ff4c4c59;
+    }
+    .fullscreen-button {
+      background: white !important;
+    }
+    .standalone-fullscreen-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 0 0 0 4px;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .sc-canvas {
+      cursor: auto;
+    }
+    .sc-monitor-root[opcode^="data_"] .sc-monitor-value-color {
+      background-color: #ff8c1a;
+    }
+    .sc-monitor-row-value-outer {
+      background-color: #00032b;
+    }
+    .sc-monitor-row-value-editing .sc-monitor-row-value-outer {
+      background-color: #000111;
+    }
+    
+  </style>
+  <meta name="theme-color" content="#00032b">
+  <link rel="icon" href="data:image/png;base64,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">
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="launch" class="screen" hidden title="Click to start">
+    <div class="green-flag">
+      <svg viewBox="0 0 16.63 17.5" width="42" height="44">
+        <defs><style>.cls-1,.cls-2{fill:#4cbf56;stroke:#45993d;stroke-linecap:round;stroke-linejoin:round;}.cls-2{stroke-width:1.5px;}</style></defs>
+        <path class="cls-1" d="M.75,2A6.44,6.44,0,0,1,8.44,2h0a6.44,6.44,0,0,0,7.69,0V12.4a6.44,6.44,0,0,1-7.69,0h0a6.44,6.44,0,0,0-7.69,0"/>
+        <line class="cls-2" x1="0.75" y1="16.75" x2="0.75" y2="0.75"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="loading" class="screen">
+    <noscript>Enable JavaScript</noscript>
+    <h1 class="loading-text">MMaker</h1>
+    
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="loading-inner"></div></div>
+  </div>
+
+  <div id="error" class="screen" hidden>
+    <h1>Error</h1>
+    <details>
+      <summary id="error-message"></summary>
+      <p id="error-stack"></p>
+    </details>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    const appElement = document.getElementById('app');
+    const launchScreen = document.getElementById('launch');
+    const loadingScreen = document.getElementById('loading');
+    const loadingInner = document.getElementById('loading-inner');
+    const errorScreen = document.getElementById('error');
+    const errorScreenMessage = document.getElementById('error-message');
+    const errorScreenStack = document.getElementById('error-stack');
+
+    const handleError = (error) => {
+      console.error(error);
+      if (!errorScreen.hidden) return;
+      errorScreen.hidden = false;
+      errorScreenMessage.textContent = '' + error;
+      let debug = error && error.stack || 'no stack';
+      debug += '\nUser agent: ' + navigator.userAgent;
+      errorScreenStack.textContent = debug;
+    };
+    const setProgress = (progress) => {
+      if (loadingInner) loadingInner.style.width = progress * 100 + '%';
+    };
+    const interpolate = (a, b, t) => a + t * (b - a);
+
+    try {
+      setProgress(0.1);
+
+      const scaffolding = new Scaffolding.Scaffolding();
+      scaffolding.width = 570;
+      scaffolding.height = 380;
+      scaffolding.resizeMode = "preserve-ratio";
+      scaffolding.editableLists = true;
+      scaffolding.usePackagedRuntime = true;
+      scaffolding.setup();
+      scaffolding.appendTo(appElement);
+
+      const vm = scaffolding.vm;
+      window.scaffolding = scaffolding;
+      window.vm = scaffolding.vm;
+      window.Scratch = {
+        vm,
+        renderer: vm.renderer,
+        audioEngine: vm.runtime.audioEngine,
+        bitmapAdapter: vm.runtime.v2BitmapAdapter,
+        videoProvider: vm.runtime.ioDevices.video.provider
+      };
+
+      scaffolding.setUsername("p####".replace(/#/g, () => Math.floor(Math.random() * 10)));
+      scaffolding.setAccentColor("#ff4c4c");
+
+      scaffolding.addCloudProvider(new Scaffolding.Cloud.WebSocketProvider(["wss://clouddata.turbowarp.org","wss://clouddata.turbowarp.xyz"], "p4-@Luk_ Ⓜ️🛠️ [v1.2.5].sb3"));
+
+      vm.setTurboMode(false);
+      if (vm.setInterpolation) vm.setInterpolation(false);
+      if (vm.setFramerate) vm.setFramerate(30);
+      if (vm.renderer.setUseHighQualityRender) vm.renderer.setUseHighQualityRender(false);
+      if (vm.setRuntimeOptions) vm.setRuntimeOptions({
+        fencing: false,
+        miscLimits: false,
+        maxClones: 9999999999,
+      });
+      if (vm.setCompilerOptions) vm.setCompilerOptions({
+        enabled: true,
+        warpTimer: false
+      });
+
+      if (typeof ScaffoldingAddons !== 'undefined') {
+        ScaffoldingAddons.run(scaffolding, {"gamepad":false,"pointerlock":false,"specialCloudBehaviors":false,"unsafeCloudBehaviors":false,"pause":false});
+      }
+
+      for (const extension of []) {
+        vm.extensionManager.loadExtensionURL(extension);
+      }
+
+      vm.runtime.on('PROJECT_RUN_STOP', () => window.close());
+
+    } catch (e) {
+      handleError(e);
+    }
+  </script>
+  
+  
+    <script>
+      const getProjectData = (function() {
+        const storage = scaffolding.storage;
+        storage.onprogress = (total, loaded) => {
+          setProgress(interpolate(0.2, 0.98, loaded / total));
+        };
+        
+        storage.addWebStore(
+          [storage.AssetType.ImageVector, storage.AssetType.ImageBitmap, storage.AssetType.Sound],
+          (asset) => new URL('./assets/' + asset.assetId + '.' + asset.dataFormat, location).href
+        );
+        return () => new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          resolve(xhr.response);
+        };
+        xhr.onerror = () => {
+          if (location.protocol === 'file:') {
+            reject(new Error('Zip environment must be used from a website, not from a file URL.'));
+          } else {
+            reject(new Error('Request to load project data failed.'));
+          }
+        };
+        xhr.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setProgress(interpolate(0.1, 0.2, e.loaded / e.total));
+          }
+        };
+        xhr.responseType = 'arraybuffer';
+        xhr.open('GET', "./assets/project.json");
+        xhr.send();
+      });
+      })();
+    </script>
+  <script>
+    const run = async () => {
+      const projectData = await getProjectData();
+      await scaffolding.loadProject(projectData);
+      setProgress(1);
+      loadingScreen.hidden = true;
+      if (true) {
+        scaffolding.start();
+      } else {
+        launchScreen.hidden = false;
+        launchScreen.addEventListener('click', () => {
+          launchScreen.hidden = true;
+          scaffolding.start();
+        });
+        launchScreen.focus();
+      }
+    };
+    run().catch(handleError);
+  </script>
+</body>
+</html>
